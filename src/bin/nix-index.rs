@@ -54,20 +54,6 @@ async fn update_index(args: &Args) -> Result<()> {
         })
     });
 
-    // Add progress output
-    let (mut indexed, mut missing) = (0, 0);
-    let files = files.inspect(|entry| {
-        if entry.is_some() {
-            indexed += 1;
-        } else {
-            missing += 1;
-        };
-
-        eprint!("+ generating index: {:05} paths found :: {:05} paths not in binary cache :: {:05} paths in queue \r",
-               indexed, missing, watch.queue_len());
-        io::stderr().flush().expect("flushing stderr failed");
-    });
-
     // Filter packages with no file listings available
     let mut files = files.filter_map(future::ready);
 
@@ -75,7 +61,7 @@ async fn update_index(args: &Args) -> Result<()> {
     if !args.filter_prefix.is_empty() {
         eprint!(" (filtering by `{}`)", args.filter_prefix);
     }
-    eprint!("\r");
+    eprintln!();
     fs::create_dir_all(&args.database).map_err(|e| Error::CreateDatabaseDir {
         path: args.database.clone(),
         source: e,
