@@ -108,27 +108,31 @@ fn main() {
 
     match run(&args) {
         Ok(attrs) => {
-            eprintdoc!(
-                "
-                The program '{}' is currently not installed.
-                You can install it with one of the following packages:
-                ",
-                args.binary
-            );
+            if attrs.is_empty() {
+                eprintln!("Command not found: '{}'", args.binary);
+            } else {
+                eprintdoc!(
+                    "
+                    The program '{}' is currently not installed.
+                    You can install it with one of the following packages:
+                    ",
+                    args.binary
+                );
 
-            // pipe to column because i'm lazy
-            let mut child = Command::new("column")
-                .arg("-x")
-                .stdin(Stdio::piped())
-                .stdout(stderr())
-                .stderr(stderr())
-                .spawn()
-                .expect("failed to execute child");
-            let mut stdin = child.stdin.take().expect("handle present");
+                // pipe to column because i'm lazy
+                let mut child = Command::new("column")
+                    .arg("-x")
+                    .stdin(Stdio::piped())
+                    .stdout(stderr())
+                    .stderr(stderr())
+                    .spawn()
+                    .expect("failed to execute child");
+                let mut stdin = child.stdin.take().expect("handle present");
 
-            for attr in attrs.into_iter() {
-                // two spaces for padding
-                writeln!(stdin, "  {}", attr).expect("failed to write to child's stdin");
+                for attr in attrs.into_iter() {
+                    // two spaces for padding
+                    writeln!(stdin, "  {}", attr).expect("failed to write to child's stdin");
+                }
             }
         }
         Err(e) => {
