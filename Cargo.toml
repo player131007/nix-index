@@ -23,6 +23,9 @@ doc = false
 name = "nix-index"
 
 [[bin]]
+name = "command-not-found"
+
+[[bin]]
 name = "nix-locate"
 
 [dependencies]
@@ -49,6 +52,7 @@ xdg = "3.0.0"
 xml-rs = "0.8.20"
 xz2 = "0.1.7"
 zstd = { version = "0.13.3", features = [ "zstdmt" ] }
+indoc = "2.0.7"
 
 [dependencies.tokio]
 features = ["full"]
@@ -65,6 +69,5 @@ version = "0.37.0"
 [[example]]
 name = "nix-index-debug"
 
-[profile]
 [profile.release]
 debug = true
