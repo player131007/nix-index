@@ -127,12 +127,17 @@ fn main() {
                     .stderr(stderr())
                     .spawn()
                     .expect("failed to execute child");
-                let mut stdin = child.stdin.take().expect("handle present");
+                {
+                    let stdin = child.stdin.as_mut().expect("handle present");
 
-                for attr in attrs.into_iter() {
-                    // two spaces for padding
-                    writeln!(stdin, "  {}", attr).expect("failed to write to child's stdin");
+                    for attr in attrs.into_iter() {
+                        // two spaces for padding
+                        writeln!(stdin, "  {}", attr).unwrap();
+                    }
+
+                    stdin.flush().unwrap();
                 }
+                child.wait().expect("command is running");
             }
         }
         Err(e) => {
