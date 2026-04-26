@@ -23,7 +23,6 @@ async fn update_index(args: &Args) -> Result<()> {
     // the packages normally. Also fall back to normal querying if the paths.cache
     // fails to load.
     let cached = if args.path_cache {
-        eprintln!("+ loading paths from cache");
         try_load_paths_cache()?
     } else {
         None
@@ -33,7 +32,10 @@ async fn update_index(args: &Args) -> Result<()> {
     eprintln!("+ querying available packages");
     let fetcher = Fetcher::new(CACHE_URL.to_string()).map_err(Error::ParseProxy)?;
     let (files, watch) = match cached {
-        Some((f, w)) => (Either::Left(f), w),
+        Some((f, w)) => {
+            eprintln!("+ loading paths from cache");
+            (Either::Left(f), w)
+        }
         None => {
             let (f, w) = listings::fetch(
                 &fetcher,
