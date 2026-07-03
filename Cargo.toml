@@ -3,7 +3,7 @@ description = "Nix (package manager) indexing primitives"
 authors = ["Benno Fünfstück <benno.fuenfstueck@gmail.com>"]
 edition = "2021"
 name = "nix-index"
-version = "0.1.11"
+version = "0.1.12"
 license = "BSD-3-Clause"
 homepage = "https://github.com/nix-community/nix-index"
 repository = "https://github.com/nix-community/nix-index"
@@ -41,7 +41,7 @@ owo-colors = { version = "4.0.0", features = ["supports-colors"] }
 rayon = "1.12.0"
 regex = "1.10.4"
 regex-syntax = "0.8.5"
-reqwest = { version = "0.13.4", features = [ "brotli" ] }
+reqwest = { version = "0.13.4", features = [ "brotli", "zstd" ] }
 separator = "0.4.1"
 serde = { version = "1.0.198", features = [ "derive" ] }
 serde_bytes = "0.11.14"

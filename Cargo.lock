@@ -329,6 +329,8 @@ checksum = "eb7b51a7d9c967fc26773061ba86150f19c50c0d65c887cb1fbe295fd16619b7"
 dependencies = [
  "brotli",
  "compression-core",
+ "zstd",
+ "zstd-safe",
 ]
 
 [[package]]
@@ -1235,7 +1237,7 @@ dependencies = [
 
 [[package]]
 name = "nix-index"
-version = "0.1.11"
+version = "0.1.12"
 dependencies = [
  "atty",
  "bincode",

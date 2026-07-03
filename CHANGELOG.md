@@ -1,7 +1,18 @@
-## 0.1.11 [Unreleased]
+## 0.1.12 [Unreleased]
 ### Added
 ### Fixed
 ### Changed
+
+## 0.1.11
+### Added
+
+* Support for zstd-compressed `.ls` listings from Hydra. (#320)
+
+### Fixed
+
+### Changed
+
+* Chore updates of the Flake lock, Cargo dependencies, and CI hardening (pinned actions, minimized permissions).
 
 ## 0.1.10
 ### Added
