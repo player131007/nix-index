@@ -377,8 +377,8 @@ impl<R: Read> PackagesParser<R> {
                     }
                 }
 
-                EndElement { name: element_name } => {
-                    if element_name.local_name == "item" {
+                EndElement { name: element_name }
+                    if element_name.local_name == "item" => {
                         if self.current_item.is_none() {
                             return Err(self.err(MissingStartTag {
                                 element_name: "item".into(),
@@ -386,7 +386,6 @@ impl<R: Read> PackagesParser<R> {
                         }
                         self.current_item = None
                     }
-                }
 
                 EndDocument => break,
 

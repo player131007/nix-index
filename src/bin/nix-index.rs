@@ -1,7 +1,7 @@
 //! Tool for generating a nix-index database.
 use std::ffi::OsStr;
 use std::fs::{self, File};
-use std::io::{self, Write};
+use std::io::{self};
 use std::path::PathBuf;
 use std::process;
 
@@ -31,7 +31,7 @@ async fn update_index(args: &Args) -> Result<()> {
 
     eprintln!("+ querying available packages");
     let fetcher = Fetcher::new(CACHE_URL.to_string()).map_err(Error::ParseProxy)?;
-    let (files, watch) = match cached {
+    let (files, _watch) = match cached {
         Some((f, w)) => {
             eprintln!("+ loading paths from cache");
             (Either::Left(f), w)

@@ -137,7 +137,7 @@ impl Fetcher {
             .map(tokio_retry::strategy::jitter)
             // wait at least 5 seconds, as that is the time that cache.nixos.org caches 500 internal server errors
             .map(|x| x + Duration::from_secs(5));
-        Box::pin(Retry::spawn(strategy, move || {
+        Box::pin(Retry::start(strategy, move || {
             Box::pin(self.fetch_noretry(url.clone()))
         }))
     }
