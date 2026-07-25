@@ -43,7 +43,9 @@ pub enum Error {
         url: String,
         tmp_file: Option<PathBuf>,
     },
-    #[error("response to GET '{url}' contained invalid store path '{path}', expected string matching format $(NIX_STORE_DIR)$(HASH)-$(NAME)")]
+    #[error(
+        "response to GET '{url}' contained invalid store path '{path}', expected string matching format $(NIX_STORE_DIR)$(HASH)-$(NAME)"
+    )]
     ParseStorePath { url: String, path: String },
     #[error("response to GET '{url}' contained invalid unicode byte {}: {err}", bytes[err.valid_up_to()])]
     Unicode {

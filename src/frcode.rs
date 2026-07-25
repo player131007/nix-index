@@ -63,7 +63,9 @@ use thiserror::Error;
 pub enum Error {
     #[error("I/O error: {0}")]
     Io(#[from] io::Error),
-    #[error("length of shared prefix must be >= 0 and <= {previous_len} (length of previous item), but found: {shared_len}")]
+    #[error(
+        "length of shared prefix must be >= 0 and <= {previous_len} (length of previous item), but found: {shared_len}"
+    )]
     SharedOutOfRange {
         previous_len: usize,
         shared_len: isize,

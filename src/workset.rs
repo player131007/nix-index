@@ -208,7 +208,7 @@ impl<K: Hash + Eq, V> Stream for WorkSet<K, V> {
                     Poll::Ready(None)
                 } else {
                     Poll::Pending
-                }
+                };
             }
         };
 

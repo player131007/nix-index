@@ -106,9 +106,14 @@ impl Writer {
 
 #[derive(Error, Debug)]
 pub enum Error {
-    #[error("expected file to start with nix-index file magic 'NIXI', but found '{found:?}' (is this a valid nix-index database file?)")]
+    #[error(
+        "expected file to start with nix-index file magic 'NIXI', but found '{found:?}' (is this a valid nix-index database file?)"
+    )]
     UnsupportedFileType { found: Vec<u8> },
-    #[error("this executable only supports the nix-index database version {}, but found a database with version {found}", FORMAT_VERSION)]
+    #[error(
+        "this executable only supports the nix-index database version {}, but found a database with version {found}",
+        FORMAT_VERSION
+    )]
     UnsupportedVersion { found: u64 },
     #[error("database corrupt, found a file entry without a matching package entry")]
     MissingPackageEntry,

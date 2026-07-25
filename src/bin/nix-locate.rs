@@ -17,9 +17,11 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum Error {
-    #[error("reading from the database at '{database}' failed: {source}.\n\
+    #[error(
+        "reading from the database at '{database}' failed: {source}.\n\
                      This may be caused by a corrupt or missing database, try (re)running `nix-index` to generate the database. \n\
-                     If the error persists please file a bug report at https://github.com/nix-community/nix-index.")]
+                     If the error persists please file a bug report at https://github.com/nix-community/nix-index."
+    )]
     ReadDatabase {
         database: PathBuf,
         #[source]
