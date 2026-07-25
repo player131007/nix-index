@@ -30,13 +30,14 @@ async fn update_index(args: &Args) -> Result<()> {
     let using_cache = cached.is_some();
 
     eprintln!("+ querying available packages");
-    let fetcher = Fetcher::new(CACHE_URL.to_string()).map_err(Error::ParseProxy)?;
+    let fetcher;
     let (files, _watch) = match cached {
         Some((f, w)) => {
             eprintln!("+ loading paths from cache");
             (Either::Left(f), w)
         }
         None => {
+            fetcher = Fetcher::new(CACHE_URL.to_string()).map_err(Error::ParseProxy)?;
             let (f, w) = listings::fetch(
                 &fetcher,
                 args.jobs,
