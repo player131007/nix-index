@@ -9,75 +9,99 @@
     };
   };
 
-  outputs = { self, nixpkgs, flake-compat }:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-compat,
+    }:
     let
       inherit (nixpkgs) lib;
-      systems = [ "x86_64-linux" "x86_64-darwin" "aarch64-darwin" "aarch64-linux" ];
+      systems = [
+        "x86_64-linux"
+        "x86_64-darwin"
+        "aarch64-darwin"
+        "aarch64-linux"
+      ];
       forAllSystems = lib.genAttrs systems;
       nixpkgsFor = nixpkgs.legacyPackages;
     in
     {
       packages = forAllSystems (system: {
-        default = with nixpkgsFor.${system}; rustPlatform.buildRustPackage {
-          pname = "nix-index";
-          inherit ((lib.importTOML ./Cargo.toml).package) version;
+        default =
+          with nixpkgsFor.${system};
+          rustPlatform.buildRustPackage {
+            pname = "nix-index";
+            inherit ((lib.importTOML ./Cargo.toml).package) version;
 
-          src = lib.sourceByRegex self [
-            "(examples|src)(/.*)?"
-            ''Cargo\.(toml|lock)''
-            ''command-not-found\.sh''
-            ''command-not-found\.nu''
-          ];
+            src = lib.sourceByRegex self [
+              "(examples|src)(/.*)?"
+              ''Cargo\.(toml|lock)''
+              ''command-not-found\.sh''
+              ''command-not-found\.nu''
+            ];
 
-          cargoLock = {
-            lockFile = ./Cargo.lock;
+            cargoLock = {
+              lockFile = ./Cargo.lock;
+            };
+
+            buildInputs = [ sqlite ];
+
+            postInstall = ''
+              substituteInPlace command-not-found.sh \
+                --subst-var out
+              install -Dm555 command-not-found.sh -t $out/etc/profile.d
+              substituteInPlace command-not-found.nu \
+                --subst-var out
+              install -Dm555 command-not-found.nu -t $out/etc/profile.d
+            '';
+
+            meta = with lib; {
+              description = "A files database for nixpkgs";
+              homepage = "https://github.com/nix-community/nix-index";
+              license = with licenses; [ bsd3 ];
+              maintainers = [ maintainers.bennofs ];
+            };
           };
-
-          buildInputs = [ sqlite ];
-
-          postInstall = ''
-            substituteInPlace command-not-found.sh \
-              --subst-var out
-            install -Dm555 command-not-found.sh -t $out/etc/profile.d
-            substituteInPlace command-not-found.nu \
-              --subst-var out
-            install -Dm555 command-not-found.nu -t $out/etc/profile.d
-          '';
-
-          meta = with lib; {
-            description = "A files database for nixpkgs";
-            homepage = "https://github.com/nix-community/nix-index";
-            license = with licenses; [ bsd3 ];
-            maintainers = [ maintainers.bennofs ];
-          };
-        };
       });
 
-      checks = forAllSystems (system:
-          let
-            packages = lib.mapAttrs' (n: lib.nameValuePair "package-${n}") self.packages.${system};
-            devShells = lib.mapAttrs' (n: lib.nameValuePair "devShell-${n}") self.devShells.${system};
-          in packages // devShells
+      checks = forAllSystems (
+        system:
+        let
+          packages = lib.mapAttrs' (n: lib.nameValuePair "package-${n}") self.packages.${system};
+          devShells = lib.mapAttrs' (n: lib.nameValuePair "devShell-${n}") self.devShells.${system};
+        in
+        packages // devShells
       );
 
       devShells = forAllSystems (system: {
-        minimal = with nixpkgsFor.${system}; mkShell {
-          name = "nix-index";
+        minimal =
+          with nixpkgsFor.${system};
+          mkShell {
+            name = "nix-index";
 
-          nativeBuildInputs = [ pkg-config ];
+            nativeBuildInputs = [ pkg-config ];
 
-          buildInputs = [ sqlite ];
-        };
+            buildInputs = [ sqlite ];
+          };
 
-        default = with nixpkgsFor.${system}; mkShell {
-          name = "nix-index";
+        default =
+          with nixpkgsFor.${system};
+          mkShell {
+            name = "nix-index";
 
-          inputsFrom = [ self.devShells.${system}.minimal ];
+            inputsFrom = [ self.devShells.${system}.minimal ];
 
-          nativeBuildInputs = [ rustc cargo clippy rustfmt ];
+            nativeBuildInputs = [
+              rustc
+              cargo
+              clippy
+              rustfmt
+              rust-analyzer
+            ];
 
-          env.RUST_SRC_PATH = rustPlatform.rustLibSrc;
-        };
+            env.RUST_SRC_PATH = rustPlatform.rustLibSrc;
+          };
       });
 
       apps = forAllSystems (system: {
