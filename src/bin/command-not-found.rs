@@ -74,32 +74,17 @@ fn run(args: &Cli) -> Result<HashSet<String>, Error> {
             database: index_file.clone(),
             source: e,
         })?
-        .filter(|v| {
-            v.as_ref().map_or(true, |v| {
-                let (ref store_path, FileTreeEntry { path: _, ref node }) = v;
+        .filter_map(|v| v.map(|v| {
+            let (store_path, FileTreeEntry { path: _, node }) = v;
+            let origin = store_path.origin();
 
-                let conditions = [
-                    store_path.origin().toplevel,
-                    matches!(node.get_type(), FileType::Regular { executable: true }),
-                ];
-
-                conditions.iter().all(|c| *c)
-            })
-        })
-        .map(|v| {
-            v.map(|v| {
-                let (store_path, _) = v;
-                format!(
-                    "{}.{}",
-                    store_path.origin().attr,
-                    store_path.origin().output
-                )
-            })
-            .map_err(|e| Error::ReadDatabase {
-                database: index_file.clone(),
-                source: e,
-            })
-        })
+            // if it's a symlink, we assume it's executable
+            (origin.toplevel && matches!(node.get_type(), FileType::Symlink | FileType::Regular { executable: true }))
+                .then(|| format!("{}.{}", origin.attr, origin.output))
+        }).map_err(|e| Error::ReadDatabase {
+            database: index_file.clone(),
+            source: e
+        }).transpose())
         .collect()
 }
 
@@ -128,7 +113,7 @@ fn main() {
                     .spawn()
                     .expect("failed to execute child");
                 {
-                    let stdin = child.stdin.as_mut().expect("handle present");
+                    let stdin = child.stdin.as_mut().expect("handle is present");
 
                     for attr in attrs.into_iter() {
                         // two spaces for padding
